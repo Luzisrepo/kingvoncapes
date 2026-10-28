@@ -829,13 +829,14 @@
   const SKIN_URL   = 'https://crafatar.com/skins/' + UUID;
   const CAPE_URL   = 'https://crafatar.com/capes/' + CAPE_UUID;
 
-  /* Fallbacks — tried in order if primary fails (404 / 500 / CORS). */
+  /* Fallbacks — Crafatar frequently returns 500s, so we pivot to Mineatar. */
   const SKIN_FALLBACKS = [
-    'https://visage.surgeplay.com/skin/' + UUID,
+    'https://api.mineatar.io/skin/' + UUID,
     'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7' // Steve
   ];
   const CAPE_FALLBACKS = [
-    'https://visage.surgeplay.com/cape/' + CAPE_UUID
+    'https://api.mineatar.io/cape/' + CAPE_UUID,
+    'https://api.mineatar.io/cape/' + CAPE_UUID.replace(/-/g, '')
   ];
 
   const canvas     = document.getElementById('skin-viewer');
