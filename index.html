@@ -826,8 +826,15 @@
   const UUID      = '2321b5c8-60ba-4a71-a319-a733ac58826d';
   const SKIN_URL  = 'https://crafatar.com/skins/' + UUID;
   const CAPE_URL  = 'https://crafatar.com/capes/' + UUID;
-  // Classic Steve — last-resort fallback if the primary skin 404s.
-  const FALLBACK_SKIN = 'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7';
+
+  /* Fallbacks — tried in order if Crafatar returns 500 / 404. */
+  const SKIN_FALLBACKS = [
+    'https://mc-heads.net/skin/' + UUID,
+    'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7' // Steve
+  ];
+  const CAPE_FALLBACKS = [
+    'https://mc-heads.net/cape/' + UUID
+  ];
 
   const canvas     = document.getElementById('skin-viewer');
   const container  = document.getElementById('viewer-container');
@@ -848,8 +855,7 @@
   }
 
   function hideLoading() {
-    if (!loadingEl) return;
-    loadingEl.hidden = true;
+    if (loadingEl) loadingEl.hidden = true;
   }
 
   /* ---------- Guard: library / WebGL ---------- */
@@ -865,8 +871,6 @@
   }
 
   /* ---------- Build viewer ---------- */
-  // Internal render resolution scaled for retina, then stretched via CSS
-  // to whatever the square container resolves to on screen.
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const RENDER_SIZE = Math.round(500 * dpr);
 
@@ -884,110 +888,146 @@
     return;
   }
 
-  // Let CSS own the display size; the canvas just fills the square container.
   canvas.style.width  = '100%';
   canvas.style.height = '100%';
 
   /* ---------- Controls: rotate + zoom ---------- */
-  viewer.controls.enableRotate = true;
-  viewer.controls.enableZoom   = true;
-  viewer.controls.enablePan    = false;   // keep the model centred
-  viewer.controls.rotateSpeed  = 0.85;
-  viewer.controls.zoomSpeed    = 0.8;
-  viewer.controls.minDistance  = 16;
-  viewer.controls.maxDistance  = 90;
+  /* 3.4.x exposes createOrbitControls() rather than viewer.controls. */
+  let controls = null;
+  try {
+    if (typeof skinview3d.createOrbitControls === 'function') {
+      controls = skinview3d.createOrbitControls(viewer);
+    } else if (viewer.controls) {
+      controls = viewer.controls;
+    }
+  } catch (err) {
+    console.warn('[kingvon] Orbit controls could not be created:', err);
+  }
+
+  if (controls) {
+    try {
+      controls.enableRotate = true;
+      controls.enableZoom   = true;
+      controls.enablePan    = false;
+      controls.rotateSpeed  = 0.85;
+      controls.zoomSpeed    = 0.8;
+      controls.minDistance  = 16;
+      controls.maxDistance  = 90;
+    } catch (err) {
+      console.warn('[kingvon] Orbit control properties could not be set:', err);
+    }
+  }
 
   /* ---------- Smooth idle rotation ---------- */
-  // RotatingAnimation spins the player mesh (not the camera), so the user
-  // can still orbit freely. Slow speed keeps it subtle.
+  /* 3.4.x uses viewer.animation, not viewer.animations.add(). */
   let idleAnimation = null;
   try {
-    idleAnimation = viewer.animations.add(skinview3d.RotatingAnimation);
-    idleAnimation.speed = 0.5;
+    if (typeof skinview3d.RotatingAnimation === 'function') {
+      idleAnimation = new skinview3d.RotatingAnimation();
+      viewer.animation = idleAnimation;
+      if ('speed' in idleAnimation) idleAnimation.speed = 0.5;
+    } else if ('autoRotate' in viewer) {
+      viewer.autoRotate = true;
+      if ('autoRotateSpeed' in viewer) viewer.autoRotateSpeed = 0.5;
+    }
   } catch (err) {
     console.warn('[kingvon] Idle animation could not start:', err);
   }
 
   /* ---------- Reset-camera ---------- */
-  // Snapshot the camera state after creation so we can restore it exactly.
-  const initialCameraPos = viewer.camera.position.clone();
-  const initialTarget    = viewer.controls.target.clone();
+  const initialCameraPos = viewer.camera ? viewer.camera.position.clone() : null;
+  const initialTarget    = controls && controls.target ? controls.target.clone() : null;
 
   if (resetBtn) {
     resetBtn.addEventListener('click', function () {
-      viewer.camera.position.copy(initialCameraPos);
-      viewer.controls.target.copy(initialTarget);
-      viewer.controls.update();
+      if (initialCameraPos && viewer.camera) {
+        viewer.camera.position.copy(initialCameraPos);
+      }
+      if (initialTarget && controls && controls.target) {
+        controls.target.copy(initialTarget);
+      }
+      if (controls) controls.update();
     });
   }
 
   /* ---------- Texture loading with graceful failure ---------- */
-  (async function loadTextures() {
-    let skinFailed = false;
-    let capeFailed = false;
-
-    // 1. Skin first so the model is visible while the cape resolves.
+  async function tryLoadSkin(url) {
     try {
-      await viewer.loadSkin(SKIN_URL, { model: 'auto-detect' });
-    } catch (skinErr) {
-      console.warn('[kingvon] Skin failed to load:', skinErr);
-      skinFailed = true;
-      try {
-        await viewer.loadSkin(FALLBACK_SKIN, { model: 'auto-detect' });
-        skinFailed = false; // fallback succeeded — treat as visible
-      } catch (fallbackErr) {
-        console.warn('[kingvon] Fallback skin also failed:', fallbackErr);
+      await viewer.loadSkin(url, { model: 'auto-detect' });
+      return true;
+    } catch (err) {
+      console.warn('[kingvon] Skin failed:', url, err);
+      return false;
+    }
+  }
+
+  async function tryLoadCape(url) {
+    try {
+      await viewer.loadCape(url);
+      return true;
+    } catch (err) {
+      console.warn('[kingvon] Cape failed:', url, err);
+      return false;
+    }
+  }
+
+  (async function loadTextures() {
+    let skinLoaded = false;
+    let capeLoaded = false;
+
+    /* 1. Skin — primary + fallbacks */
+    skinLoaded = await tryLoadSkin(SKIN_URL);
+    if (!skinLoaded) {
+      for (const url of SKIN_FALLBACKS) {
+        skinLoaded = await tryLoadSkin(url);
+        if (skinLoaded) break;
       }
     }
 
-    // 2. Cape second, independently handled.
-    try {
-      await viewer.loadCape(CAPE_URL);
-    } catch (capeErr) {
-      console.warn('[kingvon] Cape failed to load:', capeErr);
-      capeFailed = true;
-      // Nothing else to do — the model keeps rendering with just the skin.
+    /* 2. Cape — primary + fallbacks */
+    capeLoaded = await tryLoadCape(CAPE_URL);
+    if (!capeLoaded) {
+      for (const url of CAPE_FALLBACKS) {
+        capeLoaded = await tryLoadCape(url);
+        if (capeLoaded) break;
+      }
     }
 
-    // 3. Surface a subtle status, then drop the loading shimmer.
-    if (skinFailed && capeFailed) {
+    /* 3. Surface a subtle status */
+    if (!skinLoaded && !capeLoaded) {
       setStatus('Player skin and cape unavailable — showing placeholder.');
-    } else if (skinFailed) {
+    } else if (!skinLoaded) {
       setStatus('Player skin unavailable — showing placeholder without cape.');
-    } else if (capeFailed) {
+    } else if (!capeLoaded) {
       setStatus('Cape unavailable — showing player skin without cape.');
     } else {
       setStatus(null);
     }
     hideLoading();
   })().catch(function (err) {
-    // Belt-and-suspenders: nothing above should reach here, but if it does
-    // we never leave an unhandled rejection or a stuck loading shimmer.
     console.error('[kingvon] Unexpected texture-loading error:', err);
     hideLoading();
     setStatus('Player could not be loaded — try refreshing.', 'error');
   });
 
-  /* ---------- Small nicety: pause idle spin while dragging ---------- */
-  // Gives the user steady control when inspecting a detail, then resumes.
-  if (idleAnimation) {
+  /* ---------- Pause idle spin while dragging ---------- */
+  if (idleAnimation && container) {
     let resumeTimer = null;
-    container.addEventListener('pointerdown', function () {
+    function pauseIdle() {
       clearTimeout(resumeTimer);
-      idleAnimation.speed = 0;
-    });
-    container.addEventListener('pointerup', function () {
+      if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0;
+      if (viewer && 'autoRotate' in viewer) viewer.autoRotate = false;
+    }
+    function resumeIdle() {
       clearTimeout(resumeTimer);
       resumeTimer = setTimeout(function () {
-        idleAnimation.speed = 0.5;
+        if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0.5;
+        if (viewer && 'autoRotate' in viewer) viewer.autoRotate = true;
       }, 1400);
-    });
-    container.addEventListener('pointercancel', function () {
-      clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(function () {
-        idleAnimation.speed = 0.5;
-      }, 600);
-    });
+    }
+    container.addEventListener('pointerdown', pauseIdle);
+    container.addEventListener('pointerup', resumeIdle);
+    container.addEventListener('pointercancel', resumeIdle);
   }
 })();
 </script>
