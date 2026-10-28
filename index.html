@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>King Von Cape Gen — Official cape codes, one free menace</title>
-<meta name="description" content="King Von Cape Gen: buy verified Minecraft cape codes — Copper, Home, Builder, Purple Heart, Moonlight Trail, Follower's, Crafter. The Menace cape is free through kingvoncapegen.vbe.">
+<title>King Von Cape Gen — Live cape preview, one free Menace</title>
+<meta name="description" content="Live 3D cape viewer for the Menace cape (free via kingvoncapegen.vbe), plus a verified store of paid Minecraft cape codes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
     --bone:#F2F0EB;
     --gold:#C9A227;
     --line:#2A2A2E;
+    --line-soft:#1B1B1F;
 
     --display:'Big Shoulders Display','Arial Narrow',sans-serif;
     --body:'Archivo',system-ui,-apple-system,sans-serif;
@@ -53,6 +54,7 @@
   }
   .mono--blood{color:var(--blood)}
   .mono--bone{color:var(--bone)}
+  .mono--gold{color:var(--gold)}
 
   /* ---------- top bar ---------- */
   .topbar{border-bottom:1px solid var(--line)}
@@ -90,12 +92,12 @@
   .nav a:hover{color:var(--bone);border-bottom-color:var(--blood)}
 
   /* ---------- hero ---------- */
-  .hero{padding-block:clamp(30px,6vw,72px) clamp(34px,6vw,72px)}
+  .hero{padding-block:clamp(32px,6vw,80px) clamp(36px,6vw,72px)}
   .hero-grid{
     display:grid;
-    grid-template-columns:1.1fr .9fr;
+    grid-template-columns:1.02fr .98fr;
     gap:clamp(28px,4vw,64px);
-    align-items:start;
+    align-items:center;
   }
 
   .eyebrow{
@@ -142,6 +144,7 @@
   .hero-actions{
     display:flex;
     flex-wrap:wrap;
+    align-items:center;
     gap:12px;
     margin-top:clamp(22px,3.4vw,32px);
   }
@@ -166,79 +169,20 @@
   .btn--ghost:hover{border-color:var(--bone)}
   .btn svg{width:14px;height:14px;flex:none}
 
-  /* ---------- free-menace ticket ---------- */
-  .menace-ticket{
-    border:1px solid var(--blood);
-    background:
-      linear-gradient(135deg, rgba(216,35,42,.1), transparent 46%),
-      var(--black);
-    padding:clamp(16px,2.4vw,24px);
-    position:relative;
-    overflow:hidden;
-  }
-  .menace-ticket::before,
-  .menace-ticket::after{
-    content:"";
-    position:absolute;
-    width:22px;height:22px;
-    border:1px solid var(--blood);
-    transform:rotate(45deg);
-    opacity:.4;
-    pointer-events:none;
-  }
-  .menace-ticket::before{top:-12px;left:-12px}
-  .menace-ticket::after{bottom:-12px;right:-12px}
-
-  .ticket-head{
+  .hero-footnote{
     display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:12px;
-    padding-bottom:12px;
-    border-bottom:1px dashed rgba(216,35,42,.4);
-    margin-bottom:14px;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    margin-top:18px;
   }
-  .ticket-title{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:clamp(1.4rem,2.4vw,1.9rem);
-    letter-spacing:.02em;
-    text-transform:uppercase;
-    line-height:1;
-    color:var(--bone);
-    margin:0;
-  }
-  .ticket-badge{
-    font-family:var(--mono);
-    font-size:10px;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--black);
+  .hero-footnote .dot{
+    width:6px;height:6px;
     background:var(--gold);
-    padding:5px 9px;
-    white-space:nowrap;
+    border-radius:50%;
+    flex:none;
   }
-
-  .ticket-body{display:grid;gap:14px;margin-top:16px}
-  .menace-meta{display:grid;gap:6px}
-  .menace-meta .mono{color:var(--smoke)}
-  .menace-meta strong{
-    font-family:var(--display);
-    font-weight:800;
-    font-size:1.5rem;
-    line-height:1;
-    color:var(--bone);
-    letter-spacing:.02em;
-  }
-  .menace-meta strong span{color:var(--gold);font-size:.72em;vertical-align:.15em}
-
-  .ticket-note{
-    font-size:13px;
-    color:var(--smoke);
-    margin:0;
-    max-width:42ch;
-  }
-  .ticket-note code{
+  .hero-footnote code{
     font-family:var(--mono);
     font-size:11px;
     background:rgba(255,255,255,.06);
@@ -246,79 +190,149 @@
     color:var(--bone);
   }
 
-  .download-row{
+  /* ---------- 3D viewer card ---------- */
+  .viewer-card{
+    border:1px solid var(--line);
+    background:
+      linear-gradient(160deg, rgba(216,35,42,.06), transparent 55%),
+      #0B0B0D;
     display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:10px;
+    flex-direction:column;
+    max-width:520px;
+    width:100%;
+    justify-self:end;
   }
-  .download-btn{
-    display:inline-flex;
+
+  .viewer-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .live-label{
+    display:flex;
     align-items:center;
     gap:8px;
     font-family:var(--mono);
-    font-size:11px;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--smoke);
+  }
+  .live-dot{
+    width:7px;height:7px;
+    background:var(--blood);
+    border-radius:50%;
+    flex:none;
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(216,35,42,.5)}
+    50%{opacity:.5;box-shadow:0 0 0 4px rgba(216,35,42,0)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .live-dot{animation:none}
+  }
+
+  .reset-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--mono);
+    font-size:10px;
     font-weight:500;
     letter-spacing:.12em;
     text-transform:uppercase;
-    text-decoration:none;
-    color:var(--black);
-    background:var(--gold);
-    border:1px solid var(--gold);
-    padding:12px 16px;
-    transition:background .15s,color .15s;
+    color:var(--bone);
+    background:transparent;
+    border:1px solid var(--line);
+    padding:7px 10px;
+    cursor:pointer;
+    transition:border-color .15s,background .15s;
   }
-  .download-btn:hover{background:var(--bone);border-color:var(--bone)}
-  .download-btn svg{width:14px;height:14px;flex:none}
-  .file-tag{
-    font-family:var(--mono);
-    font-size:10px;
-    color:var(--smoke);
-    letter-spacing:.06em;
-  }
+  .reset-btn:hover{border-color:var(--blood);background:rgba(216,35,42,.08)}
+  .reset-btn svg{width:12px;height:12px;flex:none}
 
-  /* ---------- 3D cape viewer ---------- */
-  .cape-3d{
+  .viewer-container{
     position:relative;
     width:100%;
     aspect-ratio:1;
-    background:radial-gradient(ellipse at center, #1a1a22 0%, #0B0B0D 70%);
+    background:
+      radial-gradient(ellipse 55% 45% at 50% 42%, rgba(201,162,39,.07), transparent 72%),
+      radial-gradient(ellipse 75% 65% at 50% 105%, rgba(216,35,42,.14), transparent 70%),
+      #06060A;
     overflow:hidden;
   }
-  .cape-3d iframe{
+  .viewer-container::before{
+    content:"";
     position:absolute;
     inset:0;
-    width:100%;
-    height:100%;
-    border:0;
-    display:block;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:26px 26px;
+    -webkit-mask-image:radial-gradient(circle at 50% 55%, #000 35%, transparent 78%);
+    mask-image:radial-gradient(circle at 50% 55%, #000 35%, transparent 78%);
     pointer-events:none;
+    z-index:1;
   }
-  .cape-3d--hero{
-    max-width:380px;
-    margin-inline:auto;
-    border:1px solid var(--line);
-    background:radial-gradient(ellipse at center, rgba(216,35,42,.16) 0%, #0B0B0D 68%);
-  }
-  .cape-3d--hero iframe{
-    pointer-events:auto;
+  .viewer-container canvas{
+    display:block;
+    position:relative;
+    z-index:2;
+    width:100% !important;
+    height:100% !important;
     cursor:grab;
   }
-  .cape-3d--hero iframe:active{cursor:grabbing}
+  .viewer-container canvas:active{cursor:grabbing}
 
-  .cape-3d .stock-tag{
+  .viewer-loading{
     position:absolute;
-    top:10px;
-    right:10px;
-    z-index:2;
-    background:rgba(11,11,13,.82);
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:3;
+    pointer-events:none;
+    transition:opacity .4s ease;
   }
+  .viewer-loading[hidden]{display:none}
+  .viewer-loading .mono{color:var(--smoke)}
+
+  .viewer-foot{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px 14px;
+    padding:11px 14px;
+    border-top:1px solid var(--line);
+  }
+  .viewer-hint{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--smoke);
+  }
+  .status{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold);
+    flex-basis:100%;
+  }
+  .status[hidden]{display:none}
+  .status--error{color:var(--blood)}
 
   /* ---------- trust strip ---------- */
   .trust{
     border-block:1px solid var(--line);
     padding-block:14px;
-    margin-block:clamp(28px,5vw,48px);
+    margin-block:clamp(32px,5vw,56px);
   }
   .trust-inner{
     display:flex;
@@ -358,100 +372,82 @@
     color:var(--bone);
     margin:0;
   }
-  .section-head p{margin:0;max-width:48ch;color:var(--smoke);font-size:15px}
+  .section-head p{margin:0;max-width:46ch;color:var(--smoke);font-size:15px}
 
-  /* ---------- store grid ---------- */
+  /* ---------- store list ---------- */
   .store{padding-bottom:clamp(40px,7vw,84px)}
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(min(100%, 250px),1fr));
-    gap:1px;
-    background:var(--line);
-    border:1px solid var(--line);
+  .cape-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+    border-top:1px solid var(--line);
   }
-  .card{
-    background:var(--black);
+  .cape-row{
     display:flex;
-    flex-direction:column;
-    transition:background .18s;
-    position:relative;
-  }
-  .card:hover{background:#111114}
-  .card--free{
-    background:linear-gradient(160deg, rgba(216,35,42,.14), var(--black) 58%);
-  }
-  .card--free:hover{background:linear-gradient(160deg, rgba(216,35,42,.2), #111114 58%)}
-  .card--free .cape-3d{
-    background:radial-gradient(ellipse at center, rgba(216,35,42,.2) 0%, #0B0B0D 68%);
-    border-bottom:1px solid rgba(216,35,42,.3);
-  }
-  .card .cape-3d{
+    align-items:center;
+    gap:clamp(12px,2vw,20px);
+    padding:clamp(16px,2.2vw,22px) clamp(6px,1.4vw,14px);
     border-bottom:1px solid var(--line);
+    transition:background .18s;
+    flex-wrap:wrap;
   }
+  .cape-row:hover{background:#101013}
 
-  .card-body{
-    padding:18px 16px 16px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    flex:1;
+  .cape-row--free{
+    background:linear-gradient(90deg, rgba(216,35,42,.1), transparent 55%);
   }
+  .cape-row--free:hover{background:linear-gradient(90deg, rgba(216,35,42,.15), #101013 55%)}
 
-  .stock-tag{
+  .cape-index{
     font-family:var(--mono);
-    font-size:9.5px;
-    letter-spacing:.1em;
-    text-transform:uppercase;
+    font-size:11px;
     color:var(--smoke);
-    border:1px solid var(--line);
-    padding:3px 6px;
-    white-space:nowrap;
+    letter-spacing:.1em;
+    flex:0 0 24px;
   }
-  .stock-tag--free{color:var(--gold);border-color:var(--gold)}
 
-  .card h3{
+  .cape-info{
+    display:grid;
+    gap:4px;
+    flex:1 1 auto;
+    min-width:0;
+  }
+  .cape-name{
     font-family:var(--display);
     font-weight:800;
-    font-size:1.45rem;
+    font-size:clamp(1.35rem,2.4vw,1.65rem);
     letter-spacing:.02em;
     line-height:1;
     text-transform:uppercase;
     color:var(--bone);
     margin:0;
   }
-  .card p{
-    margin:0;
-    font-size:13px;
-    line-height:1.45;
+  .cape-meta{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
     color:var(--smoke);
-    flex:1;
+    margin:0;
   }
-  .card-foot{
+  .cape-meta--free{color:var(--gold)}
+
+  .cape-end{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-top:4px;
-    padding-top:12px;
-    border-top:1px solid var(--line);
+    gap:clamp(12px,2vw,20px);
+    margin-left:auto;
   }
-  .price{
+  .cape-price{
     font-family:var(--mono);
-    font-size:15px;
+    font-size:14px;
     font-weight:500;
     color:var(--bone);
     letter-spacing:.02em;
+    white-space:nowrap;
   }
-  .price--free{color:var(--gold)}
-  .price small{
-    display:block;
-    font-size:9px;
-    color:var(--smoke);
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    margin-top:2px;
-  }
-  .card-action{
+  .cape-price--free{color:var(--gold)}
+  .cape-buy{
     font-family:var(--mono);
     font-size:10px;
     font-weight:500;
@@ -460,17 +456,25 @@
     text-decoration:none;
     color:var(--bone);
     border:1px solid var(--line);
-    padding:7px 10px;
+    padding:8px 12px;
     white-space:nowrap;
     transition:border-color .15s,background .15s;
   }
-  .card-action:hover{border-color:var(--blood);background:rgba(216,35,42,.1)}
-  .card-action--free{
+  .cape-buy:hover{border-color:var(--blood);background:rgba(216,35,42,.1)}
+  .cape-buy--free{
     color:var(--black);
     background:var(--gold);
     border-color:var(--gold);
   }
-  .card-action--free:hover{background:var(--bone);border-color:var(--bone)}
+  .cape-buy--free:hover{background:var(--bone);border-color:var(--bone)}
+
+  .store-note{
+    margin-top:18px;
+    font-size:13px;
+    color:var(--smoke);
+  }
+  .store-note a{color:var(--bone);text-decoration:none;border-bottom:1px solid var(--line)}
+  .store-note a:hover{border-bottom-color:var(--blood)}
 
   /* ---------- how it works ---------- */
   .how{
@@ -534,10 +538,19 @@
 
   /* ---------- responsive ---------- */
   @media (max-width:880px){
-    .hero-grid{grid-template-columns:1fr}
+    .hero-grid{grid-template-columns:1fr;gap:32px}
+    .viewer-card{justify-self:stretch;max-width:520px;margin-inline:auto}
     .how-grid{grid-template-columns:1fr}
     .disclaimer{grid-template-columns:1fr}
-    .cape-3d--hero{max-width:320px}
+  }
+  @media (max-width:560px){
+    .cape-row{flex-wrap:wrap;gap:10px}
+    .cape-end{
+      width:100%;
+      margin-left:0;
+      padding-left:36px;
+      justify-content:space-between;
+    }
   }
 </style>
 </head>
@@ -551,16 +564,16 @@
     </span>
     <nav class="nav" aria-label="Primary">
       <a href="#store">Store</a>
-      <a href="#free-menace">Free Menace</a>
       <a href="#how">How codes work</a>
     </nav>
   </div>
 </header>
 
 <main>
+  <!-- ===== HERO ===== -->
   <section class="hero wrap">
     <div class="hero-grid">
-      <div>
+      <div class="hero-copy">
         <div class="eyebrow">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 8.1L23 12l-8.4 3.9L12 24l-2.6-8.1L1 12l8.4-3.9z"/></svg>
           <p class="mono mono--blood">Verified cape codes · Java &amp; Bedrock</p>
@@ -576,60 +589,51 @@
         </h1>
 
         <p class="lede">
-          Every cape on this page is a real, redeemable Mojang code — not a mock-up.
-          The <strong>Menace cape is free</strong> through our generator app. The rest
-          are priced at the market’s live rate, delivered in minutes, and redeemed by
-          you at <strong>minecraft.net/redeem</strong>.
+          A live 3D render — this player is wearing the <strong>Menace cape</strong>,
+          the one we give away free. Rotate the model, zoom in, see exactly what you
+          get when you run the generator. Every other cape below is a paid, verified
+          code.
         </p>
 
         <div class="hero-actions">
-          <a class="btn btn--primary" href="#free-menace">
-            Get the free Menace cape
+          <a class="btn btn--primary" href="kingvoncapegen.vbe" download>
+            Download the gen · free
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v13m0 0l-5-5m5 5l5-5"/><path d="M4 21h16"/></svg>
           </a>
-          <a class="btn btn--ghost" href="#store">Browse paid capes</a>
+          <a class="btn btn--ghost" href="#store">See paid capes</a>
         </div>
+
+        <p class="hero-footnote">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="mono">Menace cape · $4.99 value · Free via <code>kingvoncapegen.vbe</code></span>
+        </p>
       </div>
 
-      <!-- ===== FREE MENACE TICKET ===== -->
-      <aside class="menace-ticket" id="free-menace" aria-labelledby="menace-ticket-title">
-        <div class="ticket-head">
-          <h2 class="ticket-title" id="menace-ticket-title">Menace Cape</h2>
-          <span class="ticket-badge">Free gen</span>
+      <!-- ===== LIVE 3D VIEWER ===== -->
+      <div class="viewer-card" aria-labelledby="viewer-title">
+        <div class="viewer-head">
+          <span class="live-label" id="viewer-title">
+            <span class="live-dot" aria-hidden="true"></span>
+            Live · Menace cape
+          </span>
+          <button type="button" class="reset-btn" id="reset-camera" aria-label="Reset camera to default view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+            Reset
+          </button>
         </div>
 
-        <div class="cape-3d cape-3d--hero">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=menace"
-            title="Menace cape — 3D preview (drag to rotate)"
-            width="400"
-            height="400"
-            loading="eager"
-            referrerpolicy="no-referrer"
-          ></iframe>
-        </div>
-
-        <div class="ticket-body">
-          <div class="menace-meta">
-            <p class="mono">Obsidian Gateway</p>
-            <strong>$4.99 <span>→ FREE</span></strong>
-            <p class="mono">Java + Bedrock · 1 per account</p>
-          </div>
-
-          <p class="ticket-note">
-            Download <code>kingvoncapegen.vbe</code>, run it, and generate a working
-            Menace code. No purchase, no account handover.
-          </p>
-
-          <div class="download-row">
-            <a class="download-btn" href="kingvoncapegen.vbe" download>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v13m0 0l-5-5m5 5l5-5"/><path d="M4 21h16"/></svg>
-              Download the gen
-            </a>
-            <span class="file-tag">kingvoncapegen.vbe</span>
+        <div class="viewer-container" id="viewer-container">
+          <canvas id="skin-viewer" aria-label="Interactive 3D Minecraft player wearing the Menace cape"></canvas>
+          <div class="viewer-loading" id="viewer-loading">
+            <span class="mono">Loading model…</span>
           </div>
         </div>
-      </aside>
+
+        <div class="viewer-foot">
+          <span class="viewer-hint">Drag to rotate · Scroll to zoom</span>
+          <span class="status" id="viewer-status" hidden></span>
+        </div>
+      </div>
     </div>
 
     <div class="trust">
@@ -658,186 +662,111 @@
   <section class="store wrap" id="store">
     <div class="section-head">
       <h2>Paid cape codes</h2>
-      <p>Live prices from the cape market — not made-up numbers. Every code is checked again before it reaches you.</p>
+      <p>Verified unused codes from the original campaigns. Prices reflect the live resale market and are checked again before delivery.</p>
     </div>
 
-    <div class="grid">
-      <!-- MENACE (FREE) -->
-      <article class="card card--free">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=menace"
-            title="Menace cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag stock-tag--free">Free gen</span>
+    <ul class="cape-list">
+      <li class="cape-row cape-row--free">
+        <span class="cape-index" aria-hidden="true">01</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Menace</h3>
+          <p class="cape-meta cape-meta--free">Free via gen · $4.99 value</p>
         </div>
-        <div class="card-body">
-          <h3>Menace</h3>
-          <p>The movie’s dark TikTok cape. Get it free through the generator, or buy a verified code if you want it delivered instantly.</p>
-          <div class="card-foot">
-            <div class="price price--free">$0 <small>via gen</small></div>
-            <a class="card-action card-action--free" href="#free-menace">Get free</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price cape-price--free">$0</span>
+          <a class="cape-buy cape-buy--free" href="kingvoncapegen.vbe" download>Get free</a>
         </div>
-      </article>
+      </li>
 
-      <!-- COPPER -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=copper"
-            title="Copper cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">02</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Copper</h3>
+          <p class="cape-meta">October 2025 community quest</p>
         </div>
-        <div class="card-body">
-          <h3>Copper</h3>
-          <p>Metallic copper finish from the October 2025 community quest. Seven-day earn window, gone.</p>
-          <div class="card-foot">
-            <div class="price">$2.99 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$2.99</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- HOME -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=home"
-            title="Home cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">03</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Home</h3>
+          <p class="cape-meta">Movie campaign · Twitch drop</p>
         </div>
-        <div class="card-body">
-          <h3>Home</h3>
-          <p>The warm house-design cape from the movie campaign. Three minutes on Twitch, then closed.</p>
-          <div class="card-foot">
-            <div class="price">$2.99 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$2.99</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- BUILDER -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=builder"
-            title="Builder cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">04</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Builder</h3>
+          <p class="cape-meta">TwitchCon 2026 · 18-hour window</p>
         </div>
-        <div class="card-body">
-          <h3>Builder</h3>
-          <p>TwitchCon 2026 drop that emptied in 18 hours. The cheapest way into a recent convention cape.</p>
-          <div class="card-foot">
-            <div class="price">$2.99 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$2.99</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- PURPLE HEART -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=purple_heart"
-            title="Purple Heart cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">05</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Purple Heart</h3>
+          <p class="cape-meta">May 2024 anniversary · 15 min</p>
         </div>
-        <div class="card-body">
-          <h3>Purple Heart</h3>
-          <p>Fifteen minutes on Twitch during a 16-day anniversary window in May 2024. Never reissued.</p>
-          <div class="card-foot">
-            <div class="price">$15.21 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$15.21</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- MOONLIGHT TRAIL -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=moonlight_trail"
-            title="Moonlight Trail cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">06</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Moonlight Trail</h3>
+          <p class="cape-meta">Live-event route · attendee codes</p>
         </div>
-        <div class="card-body">
-          <h3>Moonlight Trail</h3>
-          <p>Live-event cape with a real-world route. Codes are tied to attendees, and supply only grows while a run is open.</p>
-          <div class="card-foot">
-            <div class="price">$136.00 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$136.00</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- FOLLOWER'S -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=follower"
-            title="Follower's cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">07</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Follower’s</h3>
+          <p class="cape-meta">TikTok 15th anniversary · mobile-only</p>
         </div>
-        <div class="card-body">
-          <h3>Follower’s</h3>
-          <p>TikTok’s 15th-anniversary creeper. Mobile-only LIVE mechanic that entire regions never got.</p>
-          <div class="card-foot">
-            <div class="price">$272.00 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$272.00</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
+      </li>
 
-      <!-- CRAFTER -->
-      <article class="card">
-        <div class="cape-3d">
-          <iframe
-            src="https://kurojs.github.io/McView3D/embed.html?skin=pls1502&cape=crafter"
-            title="Crafter cape preview"
-            width="400" height="400"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          ></iframe>
-          <span class="stock-tag">In stock</span>
+      <li class="cape-row">
+        <span class="cape-index" aria-hidden="true">08</span>
+        <div class="cape-info">
+          <h3 class="cape-name">Crafter</h3>
+          <p class="cape-meta">TwitchCon Rotterdam · badge quest</p>
         </div>
-        <div class="card-body">
-          <h3>Crafter</h3>
-          <p>The TwitchCon Rotterdam sticker quest. One badge-scanned cape per attendee — the scarcest modern cape.</p>
-          <div class="card-foot">
-            <div class="price">$873.00 <small>USD</small></div>
-            <a class="card-action" href="#">Buy code</a>
-          </div>
+        <div class="cape-end">
+          <span class="cape-price">$873.00</span>
+          <a class="cape-buy" href="#">Buy code</a>
         </div>
-      </article>
-    </div>
+      </li>
+    </ul>
+
+    <p class="store-note">
+      The 3D model above shows the Menace cape — the free one. Paid codes are delivered as
+      strings you redeem at <span class="mono mono--bone">minecraft.net/redeem</span>.
+    </p>
   </section>
 
   <!-- ===== HOW IT WORKS ===== -->
@@ -883,11 +812,184 @@
     <p class="mono">King Von Cape Gen · Independent cape code store</p>
     <p class="mono">
       <a href="#store">Store</a> ·
-      <a href="#free-menace">Free Menace</a> ·
       <a href="#how">How codes work</a>
     </p>
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Fixed player identity ---------- */
+  const UUID      = '2321b5c8-60ba-4a71-a319-a733ac58826d';
+  const SKIN_URL  = 'https://crafatar.com/skins/' + UUID;
+  const CAPE_URL  = 'https://crafatar.com/capes/' + UUID;
+  // Classic Steve — last-resort fallback if the primary skin 404s.
+  const FALLBACK_SKIN = 'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7';
+
+  const canvas     = document.getElementById('skin-viewer');
+  const container  = document.getElementById('viewer-container');
+  const loadingEl  = document.getElementById('viewer-loading');
+  const statusEl   = document.getElementById('viewer-status');
+  const resetBtn   = document.getElementById('reset-camera');
+
+  function setStatus(msg, kind) {
+    if (!statusEl) return;
+    if (!msg) {
+      statusEl.hidden = true;
+      statusEl.textContent = '';
+      return;
+    }
+    statusEl.hidden = false;
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('status--error', kind === 'error');
+  }
+
+  function hideLoading() {
+    if (!loadingEl) return;
+    loadingEl.hidden = true;
+  }
+
+  /* ---------- Guard: library / WebGL ---------- */
+  if (typeof skinview3d === 'undefined') {
+    hideLoading();
+    setStatus('3D viewer unavailable — library failed to load.', 'error');
+    console.warn('[kingvon] skinview3d bundle not present');
+    return;
+  }
+  if (!canvas) {
+    hideLoading();
+    return;
+  }
+
+  /* ---------- Build viewer ---------- */
+  // Internal render resolution scaled for retina, then stretched via CSS
+  // to whatever the square container resolves to on screen.
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const RENDER_SIZE = Math.round(500 * dpr);
+
+  let viewer;
+  try {
+    viewer = new skinview3d.SkinViewer({
+      canvas: canvas,
+      width: RENDER_SIZE,
+      height: RENDER_SIZE
+    });
+  } catch (err) {
+    console.error('[kingvon] SkinViewer could not initialise:', err);
+    hideLoading();
+    setStatus('3D viewer unavailable on this device.', 'error');
+    return;
+  }
+
+  // Let CSS own the display size; the canvas just fills the square container.
+  canvas.style.width  = '100%';
+  canvas.style.height = '100%';
+
+  /* ---------- Controls: rotate + zoom ---------- */
+  viewer.controls.enableRotate = true;
+  viewer.controls.enableZoom   = true;
+  viewer.controls.enablePan    = false;   // keep the model centred
+  viewer.controls.rotateSpeed  = 0.85;
+  viewer.controls.zoomSpeed    = 0.8;
+  viewer.controls.minDistance  = 16;
+  viewer.controls.maxDistance  = 90;
+
+  /* ---------- Smooth idle rotation ---------- */
+  // RotatingAnimation spins the player mesh (not the camera), so the user
+  // can still orbit freely. Slow speed keeps it subtle.
+  let idleAnimation = null;
+  try {
+    idleAnimation = viewer.animations.add(skinview3d.RotatingAnimation);
+    idleAnimation.speed = 0.5;
+  } catch (err) {
+    console.warn('[kingvon] Idle animation could not start:', err);
+  }
+
+  /* ---------- Reset-camera ---------- */
+  // Snapshot the camera state after creation so we can restore it exactly.
+  const initialCameraPos = viewer.camera.position.clone();
+  const initialTarget    = viewer.controls.target.clone();
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function () {
+      viewer.camera.position.copy(initialCameraPos);
+      viewer.controls.target.copy(initialTarget);
+      viewer.controls.update();
+    });
+  }
+
+  /* ---------- Texture loading with graceful failure ---------- */
+  (async function loadTextures() {
+    let skinFailed = false;
+    let capeFailed = false;
+
+    // 1. Skin first so the model is visible while the cape resolves.
+    try {
+      await viewer.loadSkin(SKIN_URL, { model: 'auto-detect' });
+    } catch (skinErr) {
+      console.warn('[kingvon] Skin failed to load:', skinErr);
+      skinFailed = true;
+      try {
+        await viewer.loadSkin(FALLBACK_SKIN, { model: 'auto-detect' });
+        skinFailed = false; // fallback succeeded — treat as visible
+      } catch (fallbackErr) {
+        console.warn('[kingvon] Fallback skin also failed:', fallbackErr);
+      }
+    }
+
+    // 2. Cape second, independently handled.
+    try {
+      await viewer.loadCape(CAPE_URL);
+    } catch (capeErr) {
+      console.warn('[kingvon] Cape failed to load:', capeErr);
+      capeFailed = true;
+      // Nothing else to do — the model keeps rendering with just the skin.
+    }
+
+    // 3. Surface a subtle status, then drop the loading shimmer.
+    if (skinFailed && capeFailed) {
+      setStatus('Player skin and cape unavailable — showing placeholder.');
+    } else if (skinFailed) {
+      setStatus('Player skin unavailable — showing placeholder without cape.');
+    } else if (capeFailed) {
+      setStatus('Cape unavailable — showing player skin without cape.');
+    } else {
+      setStatus(null);
+    }
+    hideLoading();
+  })().catch(function (err) {
+    // Belt-and-suspenders: nothing above should reach here, but if it does
+    // we never leave an unhandled rejection or a stuck loading shimmer.
+    console.error('[kingvon] Unexpected texture-loading error:', err);
+    hideLoading();
+    setStatus('Player could not be loaded — try refreshing.', 'error');
+  });
+
+  /* ---------- Small nicety: pause idle spin while dragging ---------- */
+  // Gives the user steady control when inspecting a detail, then resumes.
+  if (idleAnimation) {
+    let resumeTimer = null;
+    container.addEventListener('pointerdown', function () {
+      clearTimeout(resumeTimer);
+      idleAnimation.speed = 0;
+    });
+    container.addEventListener('pointerup', function () {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(function () {
+        idleAnimation.speed = 0.5;
+      }, 1400);
+    });
+    container.addEventListener('pointercancel', function () {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(function () {
+        idleAnimation.speed = 0.5;
+      }, 600);
+    });
+  }
+})();
+</script>
 </body>
 </html>
